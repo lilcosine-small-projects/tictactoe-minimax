@@ -11,6 +11,7 @@ class MoveResult(Enum):
 class Board():
     def __init__(self):
         self.board = [[None] * 3 for _ in range(3)]
+        self.winner = None
 
     def get_board(self):
         return self.board
@@ -21,50 +22,66 @@ class Board():
             print(i, row)
 
     def make_move(self, player, loc):
-        if loc[0] < 0 or loc[0] > 2:
-            return MoveResult.INVALID_LOC
-        if loc[1] < 0 or loc[1] > 2:
-            return MoveResult.INVALID_LOC
         if player not in ["X", "O"]:
             return MoveResult.INVALID_PLAYER
+        
+        legal = self.is_legal_move(loc)
 
-        if self.board[loc[1]][loc[0]] != None:
-            return MoveResult.INVALID_LOC
-
+        if legal != MoveResult.CONTINUE:
+            return legal
+        
         self.board[loc[1]][loc[0]] = player
 
-        if self.has_win():
+        if self.has_win(player):
             return MoveResult.WIN
         elif self.has_draw():
             return MoveResult.DRAW
         else:
             return MoveResult.CONTINUE
 
-    def has_win(self):
+    def is_legal_move(self, loc):
+        if loc[0] < 0 or loc[0] > 2:
+            return MoveResult.INVALID_LOC
+        if loc[1] < 0 or loc[1] > 2:
+            return MoveResult.INVALID_LOC
+
+        if self.board[loc[1]][loc[0]] != None:
+            return MoveResult.INVALID_LOC
+        
+        return MoveResult.CONTINUE
+
+    def has_win(self, player):
         for j in range(3):
             if self.board[j][0] == None:
                 continue
             if self.board[j][0] == self.board[j][1] and self.board[j][1] == self.board[j][2]:
+                self.winner = player
                 return True
 
         for i in range(3):
             if self.board[0][i] == None:
                 continue
             if self.board[0][i] == self.board[1][i] and self.board[1][i] == self.board[2][i]:
+                self.winner = player
                 return True
 
         if self.board[0][0] != None:
             if self.board[0][0] == self.board[1][1] and self.board[1][1] == self.board[2][2]:
+                self.winner = player
                 return True
         
         if self.board[0][2] != None:
             if self.board[0][2] == self.board[1][1] and self.board[1][1] == self.board[2][0]:
+                self.winner = player
                 return True
         
         return False
 
     def reset(self):
         self.board = [[None] * 3 for _ in range(3)]
+
+    def get_winner(self):
+        return self.winner
 
     def has_draw(self):
         for row in self.board:
