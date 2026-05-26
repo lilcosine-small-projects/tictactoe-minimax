@@ -1,6 +1,7 @@
 from enum import Enum
 
 class MoveResult(Enum):
+    """Move result codes"""
     INVALID_LOC = "invalid_loc"
     INVALID_PLAYER = "invalid_player"
     CONTINUE = "continue"
@@ -9,6 +10,7 @@ class MoveResult(Enum):
 
 
 class Board():
+    """Tic-tac-toe board"""
     def __init__(self):
         self.board = [[None] * 3 for _ in range(3)]
         self.winner = None
@@ -22,6 +24,16 @@ class Board():
             print(i, row)
 
     def make_move(self, player, loc):
+        """ Makes a move on the board
+
+        Args:
+            player (char): the player making the move
+            loc ([int, int]): the [x,y] location of the move being made
+
+        Returns:
+            result (MoveResult): result code of the move
+        
+        """
         if player not in ["X", "O"]:
             return MoveResult.INVALID_PLAYER
         
@@ -40,6 +52,15 @@ class Board():
             return MoveResult.CONTINUE
 
     def is_legal_move(self, loc):
+        """ Checks if a move is legal
+
+        Args:
+            loc ([int, int]): the [x,y] location of the move
+
+        Returns:
+            result (MoveResult): result code of the move
+        
+        """
         if loc[0] < 0 or loc[0] > 2:
             return MoveResult.INVALID_LOC
         if loc[1] < 0 or loc[1] > 2:
@@ -51,6 +72,15 @@ class Board():
         return MoveResult.CONTINUE
 
     def has_win(self, player):
+        """ Makes a move on the board
+
+        Args:
+            player (char): the player making the move
+
+        Returns:
+            result (bool): True if the player has a win, False otherwise
+        
+        """
         for j in range(3):
             if self.board[j][0] == None:
                 continue
@@ -78,12 +108,18 @@ class Board():
         return False
 
     def reset(self):
+        """Resets the board"""
         self.board = [[None] * 3 for _ in range(3)]
 
     def get_winner(self):
         return self.winner
 
     def has_draw(self):
+        """ Makes a move on the board
+        Returns:
+            result (bool): True if there is a tie on the board, False otherwise
+        
+        """
         for row in self.board:
             for item in row:
                 if item == None:
