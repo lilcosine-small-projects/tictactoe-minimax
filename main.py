@@ -1,6 +1,9 @@
 import tkinter as tk
 from board import Board, MoveResult
-from minimax import best_move
+from minimax import get_legal_moves
+import torch
+from network import TicTacToeNet
+from train import encode_board
 
 class TicTacToeGUI:
     def __init__(self, root):
@@ -11,6 +14,11 @@ class TicTacToeGUI:
         self.human = None
         self.ai = None
         self.player = "X"
+
+        self.net = TicTacToeNet()
+        self.net.load_state_dict(torch.load("ttt_net.pth"))
+        self.net.eval()  # disables dropout/batchnorm if you ever add them
+
         self.show_start_screen()
 
     def show_start_screen(self):
@@ -60,8 +68,23 @@ class TicTacToeGUI:
         self.status.config(text="AI is thinking...")
         self.root.after(300, self.ai_move)
 
+    def nn_move(self, board, current_player, net):
+        from minimax import get_legal_moves
+        state = encode_board(board, current_player)
+        legal = get_legal_moves(board)
+        legal_indices = [m[1] * 3 + m[0] for m in legal]
+
+        with torch.no_grad():
+            logits, _ = net(state)
+            mask = torch.full((9,), float('-inf'))
+            mask[legal_indices] = 0.0
+            probs = torch.softmax(logits + mask, dim=0)
+
+        idx = torch.argmax(probs).item()
+        return [idx % 3, idx // 3]
+
     def ai_move(self):
-        move = best_move(self.board, self.ai)
+        move = self.nn_move(self.board, self.ai, self.net)
         result = self.board.make_move(self.ai, move)
         self.buttons[move[1]][move[0]].config(text=self.ai)
         if self.check_end(result):

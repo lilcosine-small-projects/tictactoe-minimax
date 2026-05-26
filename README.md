@@ -1,4 +1,6 @@
-# Tic-Tac-Toe
+# Tic-Tac-Toe Neural Net
+
+Experimental branch to play against a neural net trained with self-play
 
 A desktop implementation of Tic-tac-toe built with Python and Tkinter, featuring an AI opponent driven by the Minimax algorithm. The AI performs an exhaustive search of the game tree to determine the optimal move at every turn, guaranteeing play that cannot be outperformed — the strongest result a human player can achieve is a draw.
 
